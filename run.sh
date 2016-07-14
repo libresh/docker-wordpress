@@ -1,19 +1,31 @@
 /bin/bash -eux
 
-chfn -f 'Wordpress Admin' www-data
-
-cat > /etc/ssmtp/ssmtp.conf << EOF
-UseTLS=Yes
-UseSTARTTLS=Yes
-root=${MAIL_USER}
-mailhub=${MAIL_HOST}:${MAIL_PORT}
-hostname=${MAIL_USER}
-AuthUser=${MAIL_USER}
-AuthPass=${MAIL_PASS}
-EOF
-
-echo "www-data:${MAIL_USER}:${MAIL_HOST}:${MAIL_PORT}" >> /etc/ssmtp/revaliases
-
-#echo "sendmail_from = ${MAIL_USER}" >> /usr/local/etc/php/php.ini
+if [ ! -e ./wp-content/mu-plugins/mail.php ]; then
+	mkdir ./wp-content/mu-plugins
+	cat > ./wp-content/mu-plugins/mail.php <<-EOF
+		<?php
+		
+		/**
+		* Plugin Name: Configure SMTP
+		* Description: Awesome way to configure SMTP
+		* Author: Pierre Ozoux * Version: 0.1
+		*/
+		
+		add_action( 'phpmailer_init', 'send_smtp_email' );
+		function send_smtp_email( \$phpmailer ) {
+			\$phpmailer->isSMTP();
+			\$phpmailer->SMTPAuth = true;
+			\$phpmailer->Host = "${MAIL_HOST}";
+			\$phpmailer->Port = "${MAIL_PORT}";
+			\$phpmailer->Username = "${MAIL_USER}";
+			\$phpmailer->Password = "${MAIL_PASS}";
+			// Encryption system to use - ssl or tls
+			\$phpmailer->SMTPSecure = "${MAIL_SECURITY}";
+			\$phpmailer->From = "${MAIL_USER}";
+			\$phpmailer->FromName = "WordPress Admin";
+		}
+		?>
+	EOF
+fi
 
 /entrypoint.sh php-fpm
