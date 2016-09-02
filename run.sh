@@ -11,6 +11,10 @@ if [ ! -e ./wp-content/mu-plugins/mail.php ]; then
 		* Author: Pierre Ozoux * Version: 0.1
 		*/
 		
+		add_filter( 'wp_mail_from', function( $email ) {
+			return "${MAIL_USER}";
+		});
+		
 		add_action( 'phpmailer_init', 'send_smtp_email' );
 		function send_smtp_email( \$phpmailer ) {
 			\$phpmailer->isSMTP();
