@@ -32,4 +32,4 @@ if [ ! -e ./wp-content/mu-plugins/mail.php ]; then
 	EOF
 fi
 
-/entrypoint.sh php-fpm
+docker-entrypoint.sh php-fpm
