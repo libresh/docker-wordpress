@@ -1,2 +1,1 @@
-# docker-wordpress
-Docker image for WordPress
+moved to https://lab.libreho.st/libre.sh/docker/wordpress
